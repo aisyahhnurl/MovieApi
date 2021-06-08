@@ -1,0 +1,37 @@
+name: Android Build
+
+on: 
+  push: 
+    branches: [ master ]
+  pull_request_target:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+#  we want to check out our project.    
+      - uses: actions/checkout@v2
+# setup our project with java 1.8        
+      - name: Set up our JDK environment
+        uses: actions/setup-java@v1.4.3
+        with:
+          java-version: 1.8
+# Build with Gradle
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - name: Run Kotlin Linter
+        run: ./gradlew lint
+
+      # Make artifact APK
+      - name: Upload APK
+        uses: actions/upload-artifact@v2.2.3
+        with:
+          name: app
+          path: app/build/outputs/apk/debug/app-debug.apk
